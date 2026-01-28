@@ -1,11 +1,10 @@
 type: service
-name: deepseek-qwen32
+name: qwen32
 
 image: lmsysorg/sglang:latest
 env:
   - HF_TOKEN
   - MODEL_ID=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
-
 commands:
   - python -m sglang.launch_server --model-path $MODEL_ID --host 0.0.0.0 --port 8000
 
