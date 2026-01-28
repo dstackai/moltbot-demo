@@ -1,0 +1,28 @@
+type: service
+name: clawdbot-service
+auth: false
+python: 3.12
+
+env:
+  - DSTACK_TOKEN
+  
+commands:
+  - sudo apt update
+  - sudo apt install -y ca-certificates curl gnupg
+  - curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+  - sudo apt install -y nodejs
+  - curl -fsSL https://molt.bot/install.sh | bash -s -- --no-onboard
+  - clawdbot config set models.providers.custom "{\"baseUrl\":\"https://deepseek-qwen32.bihan-gateway.dstack.ai/v1\",\"apiKey\":\"$DSTACK_TOKEN\",\"api\":\"openai-completions\",\"models\":[{\"id\":\"deepseek-ai/DeepSeek-R1-Distill-Qwen-32B\",\"name\":\"DeepSeek-R1-Distill-Qwen-32B\",\"reasoning\":true,\"input\":[\"text\"],\"cost\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0},\"contextWindow\":128000,\"maxTokens\":512}]}" --json
+  - clawdbot models set custom/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  - clawdbot config set gateway.mode local
+  - clawdbot config set gateway.auth.token "$DSTACK_TOKEN"
+  - clawdbot config set gateway.controlUi.allowInsecureAuth true
+  - clawdbot config set gateway.auth.mode token
+  - clawdbot config set gateway.trustedProxies '["127.0.0.1"]'
+  - clawdbot gateway
+  
+
+port: 18789
+
+resources:
+  cpu: 2
