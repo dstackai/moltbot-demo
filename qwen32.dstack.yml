@@ -16,6 +16,24 @@ commands:
 port: 8000
 model: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
 
+probes:
+  - type: http
+    method: post
+    url: /v1/chat/completions
+    headers:
+      - name: Content-Type
+        value: application/json
+    body: |
+      {
+        "model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+        "messages": [{"role": "user", "content": "hi"}],
+        "max_tokens": 1
+      }
+    timeout: 30s
+
+# Uncomment to use allow spot instances
+#spot_policy: auto
+
 resources:
   gpu: H100
   disk: 200GB
