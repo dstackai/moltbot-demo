@@ -1,11 +1,11 @@
-# Deploying Moltbot on GPU clouds with `dstack`
+# Deploying OpenClaw (ClawdBot) on GPU clouds with `dstack`
 
 ## Prerequisites
 
 1. Install [`dstack`](https://github.com/dstackai/dstack/)
 2. Set up a `dstack` [gateway](https://dstack.ai/docs/concepts/gateways/) (already set up for you if you sign up with [dstack Sky](https://sky.dstack.ai))
 
-## Deploy a model
+## Deploy a model (Qwen 32B)
 
 ```yaml
 type: service
@@ -26,8 +26,12 @@ commands:
 port: 8000
 model: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
 
+# Uncomment to use allow spot instances
+#spot_policy: auto
+
 resources:
   gpu: H100
+  disk: 200GB
 ```
 
 ```shell
@@ -37,11 +41,11 @@ dstack apply -f qwen32.dstack.yml
 
 Once the model is deployed, the OpenAI-compatible base URL will be avaiable at `https://qwen32.<your gateway domain>/v1`.
 
-## Deploy Moltbot
+## Deploy OpenClaw
 
 ```yaml
 type: service
-name: moltbot
+name: openclaw
 
 env:
   - MODEL_BASE_URL
@@ -52,14 +56,14 @@ commands:
   - sudo apt update
   - sudo apt install -y ca-certificates curl gnupg
 
-  # Node.js & moltbot installation
+  # Node.js & openclaw installation
   - curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
   - sudo apt install -y nodejs
-  - curl -fsSL https://molt.bot/install.sh | bash -s -- --no-onboard
+  - curl -fsSL https://openclaw.bot/install.sh | bash -s -- --no-onboard
 
   # Model configuration
   - |
-    clawdbot config set models.providers.custom '{
+    openclaw config set models.providers.custom '{
       "baseUrl": "'"$MODEL_BASE_URL"'",
       "apiKey": "'"$DSTACK_TOKEN"'",
       "api": "openai-completions",
@@ -77,15 +81,15 @@ commands:
     }' --json
 
   # Set active model & gateway settings
-  - clawdbot models set custom/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
-  - clawdbot config set gateway.mode local
-  - clawdbot config set gateway.auth.mode token
-  - clawdbot config set gateway.auth.token "$DSTACK_TOKEN"
-  - clawdbot config set gateway.controlUi.allowInsecureAuth true
-  - clawdbot config set gateway.trustedProxies '["127.0.0.1"]'
+  - openclaw models set custom/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  - openclaw config set gateway.mode local
+  - openclaw config set gateway.auth.mode token
+  - openclaw config set gateway.auth.token "$DSTACK_TOKEN"
+  - openclaw config set gateway.controlUi.allowInsecureAuth true
+  - openclaw config set gateway.trustedProxies '["127.0.0.1"]'
 
   # Start service
-  - clawdbot gateway
+  - openclaw gateway
 
 port: 18789
 auth: false
@@ -97,9 +101,9 @@ resources:
 ```shell
 export MODEL_BASE_URL=<your model endpoint>
 DSTACK_TOKEN=<your dstack token>
-dstack apply -f moltbot.dstack.yml
+dstack apply -f openclaw.dstack.yml
 ```
 
-The Moltbot UI will be available at `https://moltbot.<your gateway domain>/chat`.
+The Moltbot UI will be available at `https://openclaw.<your gateway domain>/chat`.
 
 <img src="https://dstack.ai/static-assets/static-assets/images/dstack-moltbot-ui.png" width="750" />
