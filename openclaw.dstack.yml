@@ -1,5 +1,5 @@
 type: service
-name: moltbot
+name: openclaw
 
 env:
   - MODEL_BASE_URL
@@ -10,14 +10,14 @@ commands:
   - sudo apt update
   - sudo apt install -y ca-certificates curl gnupg
 
-  # Node.js & moltbot installation
+  # Node.js & openclaw installation
   - curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
   - sudo apt install -y nodejs
-  - curl -fsSL https://molt.bot/install.sh | bash -s -- --no-onboard
+  - curl -fsSL https://openclaw.bot/install.sh | bash -s -- --no-onboard
 
   # Model configuration
   - |
-    clawdbot config set models.providers.custom '{
+    openclaw config set models.providers.custom '{
       "baseUrl": "'"$MODEL_BASE_URL"'",
       "apiKey": "'"$DSTACK_TOKEN"'",
       "api": "openai-completions",
@@ -35,18 +35,22 @@ commands:
     }' --json
 
   # Set active model & gateway settings
-  - clawdbot models set custom/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
-  - clawdbot config set gateway.mode local
-  - clawdbot config set gateway.auth.mode token
-  - clawdbot config set gateway.auth.token "$DSTACK_TOKEN"
-  - clawdbot config set gateway.controlUi.allowInsecureAuth true
-  - clawdbot config set gateway.trustedProxies '["127.0.0.1"]'
+  - openclaw models set custom/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  - openclaw config set gateway.mode local
+  - openclaw config set gateway.auth.mode token
+  - openclaw config set gateway.auth.token "$DSTACK_TOKEN"
+  - openclaw config set gateway.controlUi.allowInsecureAuth true
+  - openclaw config set gateway.trustedProxies '["127.0.0.1"]'
 
   # Start service
-  - clawdbot gateway
+  - openclaw gateway
 
 port: 18789
 auth: false
+
+probes:
+  - type: http
+    url: /
 
 resources:
   cpu: 2
